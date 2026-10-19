@@ -1,0 +1,2 @@
+default_fqbn: SiliconLabs:silabs:xiao_mg24:protocol_stack=zigbee
+default_port: /dev/ttyACM0

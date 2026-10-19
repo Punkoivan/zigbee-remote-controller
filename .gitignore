@@ -1,0 +1,3 @@
+*.FCBak
+__pycache__/
+build/
