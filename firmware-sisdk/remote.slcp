@@ -1,0 +1,111 @@
+project_name: remote
+label: Zigbee keypad remote
+package: zigbee
+category: Zigbee Application
+quality: experimental
+description: >
+  Battery Zigbee 4x4 keypad remote for Home Assistant (ZHA) on Seeed Studio XIAO MG24.
+  Sleepy end device: every key press goes to the coordinator as Level Control move_to_level
+  (endpoint 10 = short press, 11 = long press, level = key number).
+
+component:
+  - id: sl_main
+  - id: zigbee_pro_leaf_stack
+  - id: zigbee_zcl_framework_core
+  - id: zigbee_basic
+  - id: zigbee_identify
+  - id: zigbee_end_device_support
+  - id: zigbee_network_steering
+  - id: zigbee_scan_dispatch
+  - id: zigbee_update_tc_link_key
+  - id: zigbee_debug_print
+  - id: iostream_usart
+    instance:
+      - vcom
+  - id: iostream_retarget_stdio
+  - id: power_manager
+  - id: sleeptimer
+  - id: clock_manager
+  - id: gpio
+  - id: emlib_iadc
+  - id: emlib_gpio
+  - id: emlib_emu
+  - id: rail_util_pa
+  - id: toolchain_gcc_lto
+    condition:
+      - toolchain_gcc
+
+configuration:
+  - name: SLI_ZIGBEE_PRIMARY_NETWORK_DEVICE_TYPE
+    value: SLI_ZIGBEE_NETWORK_DEVICE_TYPE_SLEEPY_END_DEVICE
+  - name: SLI_ZIGBEE_PRIMARY_NETWORK_SECURITY_TYPE
+    value: SLI_ZIGBEE_NETWORK_SECURITY_TYPE_3_0
+  - name: SL_ZIGBEE_BINDING_TABLE_SIZE
+    value: 4
+  - name: NVM3_DEFAULT_NVM_SIZE
+    value: 32768
+  - name: SL_PSA_ITS_SUPPORT_V1_DRIVER
+    value: 0
+  - name: SL_PSA_ITS_SUPPORT_V2_DRIVER
+    value: 0
+  - name: SL_PSA_ITS_SUPPORT_V3_DRIVER
+    value: 1
+  # The poll timers drive everything; console RX must not keep the chip out of EM2
+  - name: SL_IOSTREAM_USART_VCOM_RESTRICT_ENERGY_MODE_TO_ALLOW_RECEPTION
+    value: 0
+  - name: SL_IOSTREAM_USART_VCOM_FLOW_CONTROL_TYPE
+    value: usartHwFlowControlNone
+  - name: SL_IOSTREAM_USART_VCOM_CONVERT_BY_DEFAULT_LF_TO_CRLF
+    value: 1
+  # The remote only listens for replies right after it sent something
+  - name: SL_ZIGBEE_AF_PLUGIN_END_DEVICE_SUPPORT_LONG_POLL_INTERVAL_SECONDS
+    value: 1800
+  - name: SL_ZIGBEE_AF_PLUGIN_END_DEVICE_SUPPORT_SHORT_POLL_INTERVAL_SECONDS
+    value: 1
+  # Network steering joins at +3 dBm by default
+  - name: SL_ZIGBEE_AF_PLUGIN_NETWORK_STEERING_RADIO_TX_POWER
+    value: 10
+  # XIAO MG24 crystals and supply (values from the Seeed board support package)
+  - name: SL_CLOCK_MANAGER_HFXO_FREQ
+    value: 39000000
+  - name: SL_CLOCK_MANAGER_HFXO_CTUNE
+    value: 95
+  - name: SL_CLOCK_MANAGER_LFXO_EN
+    value: 1
+  - name: SL_CLOCK_MANAGER_LFXO_CTUNE
+    value: 44
+  - name: SL_CLOCK_MANAGER_DEFAULT_LF_CLOCK_SOURCE
+    value: SL_CLOCK_MANAGER_DEFAULT_LF_CLOCK_SOURCE_LFXO
+  - name: SL_DEVICE_INIT_DCDC_ENABLE
+    value: 1
+  - name: SL_DEVICE_INIT_DCDC_PFMX_IPKVAL_OVERRIDE
+    value: 1
+  - name: SL_DEVICE_INIT_DCDC_PFMX_IPKVAL
+    value: 9
+  - name: SL_RAIL_UTIL_PA_POWER_DECI_DBM
+    value: 100
+  - name: SL_RAIL_UTIL_PA_VOLTAGE_MV
+    value: 3300
+
+source:
+  - path: main.c
+  - path: app.c
+  - path: keypad.c
+  - path: battery.c
+  - path: board.c
+
+include:
+  - path: ./
+    file_list:
+      - path: keypad.h
+      - path: battery.h
+      - path: board.h
+
+config_file:
+  - path: config/zcl/zcl_config.zap
+    file_id: zap_configuration_file_id
+    directory: zcl
+
+toolchain_settings:
+  - option: optimize
+    value: size

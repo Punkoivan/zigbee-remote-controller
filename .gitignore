@@ -1,3 +1,9 @@
 *.FCBak
 __pycache__/
 build/
+firmware-sisdk/autogen/
+firmware-sisdk/cmake_gcc/
+firmware-sisdk/cmake_iar/
+firmware-sisdk/cmake_llvm/
+firmware-sisdk/AGENTS.md
+firmware-sisdk/config/zcl/slc_args.json
